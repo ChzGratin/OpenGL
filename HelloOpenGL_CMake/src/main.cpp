@@ -5,9 +5,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-//identifier "WINDOW_WIDTH" is undefined
-//identifier "WINDOW_HEIGHT" is undefined
-//identifier "WINDOW_NAME" is undefined
+//target_compile_definitions()
+//VSCode: If "identifier "..." is undefined" error occurred, restart VSCode!
+//#define WINDOW_NAME "HelloOpenGL (with CMake)"
+//#define WINDOW_WIDTH 800
+//#define WINDOW_HEIGHT 600
 
 void framebuffersize_callback(GLFWwindow*, int, int);
 
