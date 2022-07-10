@@ -30,7 +30,7 @@ int main()
 
     // current_path(): BasicOpenGL\\build\\Debug (or Release)
     // std::cout << std::filesystem::current_path() << std::endl;
-    ShaderProgram("../../shader/vertshader.vs", "../../shader/fragshader.fs");
+    ShaderProgram mySP("../../shader/vertshader.vs", "../../shader/fragshader.fs");
 
 	//render loop
 	while (!glfwWindowShouldClose(win))
