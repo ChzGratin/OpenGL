@@ -1,4 +1,5 @@
 #include <Shader.hpp>
+#include <Image.hpp>
 
 // #include <filesystem>
 
@@ -30,7 +31,24 @@ int main()
 
     // current_path(): BasicOpenGL\\build\\Debug (or Release)
     // std::cout << std::filesystem::current_path() << std::endl;
+
     ShaderProgram mySP("../../shader/vertshader.vs", "../../shader/fragshader.fs");
+	
+	float vert[] = { 0.5, -0.5, 0.0,
+					 0.0,  0.5, 0.0,
+					-0.5, -0.5, 0.0};
+	GLuint VAO, VBO;
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vert), vert, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+	glEnableVertexAttribArray(0);
+
+	Image myImg("../../resource/hifumi_10.jpg", GL_TEXTURE_2D);
 
 	//render loop
 	while (!glfwWindowShouldClose(win))
@@ -41,6 +59,12 @@ int main()
 		glClearColor(0.25f, 0.25f, 0.25, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		//render object
+		mySP.use();
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		//double buffering
 		glfwSwapBuffers(win);
 		glfwPollEvents();
 	}

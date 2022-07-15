@@ -9,6 +9,7 @@ add_executable(
     ${PROJECT_NAME}
     src/main.cpp
     include/Shader.hpp
+    include/Image.hpp
     )
 
 include(Dependency.cmake)

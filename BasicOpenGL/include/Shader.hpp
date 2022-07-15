@@ -1,14 +1,20 @@
 #ifndef _SHADER_
 #define _SHADER_
 
+// spdlog
 #include <spdlog/spdlog.h>
+
+// opengl
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+// glm
+#include <glm/glm.hpp>
+
+// std
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <iostream>
 
 // ==== shader class ====
 
@@ -33,6 +39,7 @@ class Shader
     Shader& operator=(const Shader& s) {};
 };
 
+// e.g.) Shader myS("vertshader.vs", GL_VERTEX_SHADER);
 Shader::Shader(char* shaderPath, GLenum type)
 {
     // local vars
@@ -111,6 +118,23 @@ class ShaderProgram
 
     void use();
 
+    void setBool(char* n, bool b);
+    void setInt(char* n, int i);
+    void setFloat(char* n, float f);
+
+    void setVec2(char* n, float x, float y);
+    void setVec2(char* n, glm::vec2 v2);
+
+    void setVec3(char* n, float x, float y, float z);
+    void setVec3(char* n, glm::vec3 v3);
+
+    void setVec4(char* n, float x, float y, float z, float w);
+    void setVec4(char* n, glm::vec4 v4);
+
+    void setMat2(char* n, glm::mat2 m2);
+    void setMat3(char* n, glm::mat3 m3);
+    void setMat4(char* n, glm::mat4 m4);
+
     private:
     bool checkLinkError();
 
@@ -124,13 +148,17 @@ class ShaderProgram
 // add implemetations of geometry shader and others
 ShaderProgram::ShaderProgram(char* vertShaderPath, char* fragShaderPath, char* geoShaderPath = nullptr)
 {
-    Shader vertShader(vertShaderPath, GL_VERTEX_SHADER), fragShader(fragShaderPath, GL_FRAGMENT_SHADER);
+    // prepare shaders
+    Shader vertShader(vertShaderPath, GL_VERTEX_SHADER);
+    Shader fragShader(fragShaderPath, GL_FRAGMENT_SHADER);
     if(!vertShader.getShaderID()) { SPDLOG_WARN("ignored invalid vertex shader ({})", vertShaderPath); }
     if(!fragShader.getShaderID()) { SPDLOG_WARN("ignored invalid fragment shader ({})", fragShaderPath); }
 
+    // create shader program
     m_ShaderProgramID = glCreateProgram();
     if(!m_ShaderProgramID) { SPDLOG_ERROR("failed to create shader program"); return; }
 
+    // attach shaders and link shader program
     SPDLOG_INFO("linking shader program {} ({} {})", m_ShaderProgramID, vertShaderPath, fragShaderPath);
     glAttachShader(m_ShaderProgramID, vertShader.getShaderID());
     glAttachShader(m_ShaderProgramID, fragShader.getShaderID());
@@ -145,6 +173,23 @@ ShaderProgram::ShaderProgram(char* vertShaderPath, char* fragShaderPath, char* g
 }
 
 void ShaderProgram::use() { glUseProgram(m_ShaderProgramID); }
+
+void ShaderProgram::setBool(char* name, bool b) { glUniform1i(glGetUniformLocation(m_ShaderProgramID, name), (int)b); };
+void ShaderProgram::setInt(char* name, int i) { glUniform1i(glGetUniformLocation(m_ShaderProgramID, name), i); };
+void ShaderProgram::setFloat(char* name, float f) { glUniform1f(glGetUniformLocation(m_ShaderProgramID, name), f); };
+
+void ShaderProgram::setVec2(char* name, float x, float y) { glUniform2f(glGetUniformLocation(m_ShaderProgramID, name), x, y); };
+void ShaderProgram::setVec2(char* name, glm::vec2 v2) { glUniform2fv(glGetUniformLocation(m_ShaderProgramID, name), 1, &v2[0]); };
+
+void ShaderProgram::setVec3(char* name, float x, float y, float z) { glUniform3f(glGetUniformLocation(m_ShaderProgramID, name), x, y, z); };
+void ShaderProgram::setVec3(char* name, glm::vec3 v3) { glUniform3fv(glGetUniformLocation(m_ShaderProgramID, name), 1, &v3[0]); };
+
+void ShaderProgram::setVec4(char* name, float x, float y, float z, float w) { glUniform4f(glGetUniformLocation(m_ShaderProgramID, name), x, y, z, w); };
+void ShaderProgram::setVec4(char* name, glm::vec4 v4) { glUniform4fv(glGetUniformLocation(m_ShaderProgramID, name), 1, &v4[0]); };
+
+void ShaderProgram::setMat2(char* name, glm::mat2 m2) { glUniformMatrix2fv(glGetUniformLocation(m_ShaderProgramID, name), 1, GL_FALSE, &m2[0][0]); };
+void ShaderProgram::setMat3(char* name, glm::mat3 m3) { glUniformMatrix3fv(glGetUniformLocation(m_ShaderProgramID, name), 1, GL_FALSE, &m3[0][0]); };
+void ShaderProgram::setMat4(char* name, glm::mat4 m4) { glUniformMatrix4fv(glGetUniformLocation(m_ShaderProgramID, name), 1, GL_FALSE, &m4[0][0]); };
 
 // check error from glLinkProgram()
 // return: true (error occurred), false (no error)
