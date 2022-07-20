@@ -43,7 +43,7 @@ class Image
 
 inline void Image::nullify()
 {
-    m_imageID = NULL;
+    m_imageID = 0;
     m_width = m_height = m_nrChannels = 0;
 }
 
@@ -77,7 +77,7 @@ void Image::loadFromFile(char* imagePath, GLenum target)
     // local vars
     unsigned char* data;
 
-    // update members
+    // delete existing image
     if(m_imageID)
     {
         SPDLOG_WARN("delete existing image (ImageID={})", m_imageID);

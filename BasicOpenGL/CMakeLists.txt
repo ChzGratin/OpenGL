@@ -10,6 +10,8 @@ add_executable(
     src/main.cpp
     include/Shader.hpp
     include/Image.hpp
+    include/Mesh.hpp
+    include/Model.hpp
     )
 
 include(Dependency.cmake)

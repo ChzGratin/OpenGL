@@ -26,14 +26,14 @@ class Shader
     
     public:
     Shader();
-    Shader(char* const, GLenum);
+    Shader(const char*, GLenum);
     ~Shader();
 
     public:
     GLuint getShaderID() { return m_shaderID; };
 
     public:
-    void loadFromFile(char*, GLenum);
+    void loadFromFile(const char*, GLenum);
     private:
     bool checkCompileError();
     
@@ -42,12 +42,12 @@ class Shader
     Shader& operator=(const Shader& s) {};
 };
 
-inline void Shader::nullify() { m_shaderID = NULL; }
+inline void Shader::nullify() { m_shaderID = 0; }
 
 Shader::Shader() { nullify(); }
 
 // e.g.) Shader myShader("vertshader.vs", GL_VERTEX_SHADER);
-Shader::Shader(char* shaderPath, GLenum type)
+Shader::Shader(const char* shaderPath, GLenum type)
 {
     nullify();
     loadFromFile(shaderPath, type);
@@ -63,7 +63,7 @@ Shader::~Shader()
 }
 
 // e.g.) Shader myShader.loadFromFile("vertshader.vs", GL_VERTEX_SHADER);
-void Shader::loadFromFile(char* shaderPath, GLenum type)
+void Shader::loadFromFile(const char* shaderPath, GLenum type)
 {
     // local vars
     std::ifstream shaderFile;
@@ -147,32 +147,32 @@ class ShaderProgram
 
     public:
     ShaderProgram();
-    ShaderProgram(char*, char*, char*);
+    ShaderProgram(const char*, const char*, const char*);
     ~ShaderProgram();
 
     void use();
 
-    void setBool(char*, bool);
-    void setInt(char*, int);
-    void setFloat(char*, float);
+    void setBool(const char*, bool);
+    void setInt(const char*, int);
+    void setFloat(const char*, float);
 
-    void setVec2(char*, float, float);
-    void setVec2(char*, glm::vec2);
+    void setVec2(const char*, float, float);
+    void setVec2(const char*, glm::vec2&);
 
-    void setVec3(char*, float, float, float);
-    void setVec3(char*, glm::vec3);
+    void setVec3(const char*, float, float, float);
+    void setVec3(const char*, glm::vec3&);
 
-    void setVec4(char*, float, float, float, float);
-    void setVec4(char*, glm::vec4);
+    void setVec4(const char*, float, float, float, float);
+    void setVec4(const char*, glm::vec4&);
 
-    void setMat2(char*, glm::mat2);
-    void setMat3(char*, glm::mat3);
-    void setMat4(char*, glm::mat4);
+    void setMat2(const char*, glm::mat2&);
+    void setMat3(const char*, glm::mat3&);
+    void setMat4(const char*, glm::mat4&);
 
-    void setSampler(char*, int);
+    void setSampler(const char*, int);
 
     public:
-    void loadFromFile(char*, char*, char*);
+    void loadFromFile(const char*, const char*, const char*);
     private:
     bool checkLinkError();
 
@@ -185,7 +185,7 @@ inline void ShaderProgram::nullify() { m_shaderProgramID = NULL; }
 
 ShaderProgram::ShaderProgram() { nullify(); }
 
-ShaderProgram::ShaderProgram(char* vertShaderPath, char* fragShaderPath, char* geoShaderPath)
+ShaderProgram::ShaderProgram(const char* vertShaderPath, const char* fragShaderPath, const char* geoShaderPath)
 {
     nullify();
     loadFromFile(vertShaderPath, fragShaderPath, geoShaderPath);
@@ -202,26 +202,26 @@ ShaderProgram::~ShaderProgram()
 
 void ShaderProgram::use() { glUseProgram(m_shaderProgramID); }
 
-void ShaderProgram::setBool(char* name, bool b) { glUniform1i(glGetUniformLocation(m_shaderProgramID, name), (int)b); };
-void ShaderProgram::setInt(char* name, int i) { glUniform1i(glGetUniformLocation(m_shaderProgramID, name), i); };
-void ShaderProgram::setFloat(char* name, float f) { glUniform1f(glGetUniformLocation(m_shaderProgramID, name), f); };
+void ShaderProgram::setBool(const char* name, bool b) { glUniform1i(glGetUniformLocation(m_shaderProgramID, name), (int)b); };
+void ShaderProgram::setInt(const char* name, int i) { glUniform1i(glGetUniformLocation(m_shaderProgramID, name), i); };
+void ShaderProgram::setFloat(const char* name, float f) { glUniform1f(glGetUniformLocation(m_shaderProgramID, name), f); };
 
-void ShaderProgram::setVec2(char* name, float x, float y) { glUniform2f(glGetUniformLocation(m_shaderProgramID, name), x, y); };
-void ShaderProgram::setVec2(char* name, glm::vec2 v2) { glUniform2fv(glGetUniformLocation(m_shaderProgramID, name), 1, &v2[0]); };
+void ShaderProgram::setVec2(const char* name, float x, float y) { glUniform2f(glGetUniformLocation(m_shaderProgramID, name), x, y); };
+void ShaderProgram::setVec2(const char* name, glm::vec2& v2) { glUniform2fv(glGetUniformLocation(m_shaderProgramID, name), 1, &v2[0]); };
 
-void ShaderProgram::setVec3(char* name, float x, float y, float z) { glUniform3f(glGetUniformLocation(m_shaderProgramID, name), x, y, z); };
-void ShaderProgram::setVec3(char* name, glm::vec3 v3) { glUniform3fv(glGetUniformLocation(m_shaderProgramID, name), 1, &v3[0]); };
+void ShaderProgram::setVec3(const char* name, float x, float y, float z) { glUniform3f(glGetUniformLocation(m_shaderProgramID, name), x, y, z); };
+void ShaderProgram::setVec3(const char* name, glm::vec3& v3) { glUniform3fv(glGetUniformLocation(m_shaderProgramID, name), 1, &v3[0]); };
 
-void ShaderProgram::setVec4(char* name, float x, float y, float z, float w) { glUniform4f(glGetUniformLocation(m_shaderProgramID, name), x, y, z, w); };
-void ShaderProgram::setVec4(char* name, glm::vec4 v4) { glUniform4fv(glGetUniformLocation(m_shaderProgramID, name), 1, &v4[0]); };
+void ShaderProgram::setVec4(const char* name, float x, float y, float z, float w) { glUniform4f(glGetUniformLocation(m_shaderProgramID, name), x, y, z, w); };
+void ShaderProgram::setVec4(const char* name, glm::vec4& v4) { glUniform4fv(glGetUniformLocation(m_shaderProgramID, name), 1, &v4[0]); };
 
-void ShaderProgram::setMat2(char* name, glm::mat2 m2) { glUniformMatrix2fv(glGetUniformLocation(m_shaderProgramID, name), 1, GL_FALSE, &m2[0][0]); };
-void ShaderProgram::setMat3(char* name, glm::mat3 m3) { glUniformMatrix3fv(glGetUniformLocation(m_shaderProgramID, name), 1, GL_FALSE, &m3[0][0]); };
-void ShaderProgram::setMat4(char* name, glm::mat4 m4) { glUniformMatrix4fv(glGetUniformLocation(m_shaderProgramID, name), 1, GL_FALSE, &m4[0][0]); };
+void ShaderProgram::setMat2(const char* name, glm::mat2& m2) { glUniformMatrix2fv(glGetUniformLocation(m_shaderProgramID, name), 1, GL_FALSE, &m2[0][0]); };
+void ShaderProgram::setMat3(const char* name, glm::mat3& m3) { glUniformMatrix3fv(glGetUniformLocation(m_shaderProgramID, name), 1, GL_FALSE, &m3[0][0]); };
+void ShaderProgram::setMat4(const char* name, glm::mat4& m4) { glUniformMatrix4fv(glGetUniformLocation(m_shaderProgramID, name), 1, GL_FALSE, &m4[0][0]); };
 
-void ShaderProgram::setSampler(char* name, int i) { setInt(name, i); }
+void ShaderProgram::setSampler(const char* name, int i) { setInt(name, i); }
 
-void ShaderProgram::loadFromFile(char* vertShaderPath, char* fragShaderPath, char* geomShaderPath)
+void ShaderProgram::loadFromFile(const char* vertShaderPath, const char* fragShaderPath, const char* geomShaderPath)
 {
     SPDLOG_INFO("ShaderProgram::loadFromFile(...)");
 

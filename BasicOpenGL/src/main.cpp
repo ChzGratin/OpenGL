@@ -1,5 +1,7 @@
 #include <Shader.hpp>
 #include <Image.hpp>
+#include <Mesh.hpp>
+//#include <Model.hpp>
 
 // #include <filesystem>
 
@@ -13,7 +15,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-	GLFWwindow* win = glfwCreateWindow(800, 600, "BasicOpenGL", nullptr, nullptr);
+	GLFWwindow* win = glfwCreateWindow(600, 600, "BasicOpenGL", nullptr, nullptr);
 	if (!win)
 	{
 		glfwTerminate();
@@ -26,49 +28,52 @@ int main()
 		return -1;
 	}
 
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, 600, 600);
 	glfwSetFramebufferSizeCallback(win, framebuffersize_callback);
 
     // current_path(): BasicOpenGL\\build\\Debug (or Release)
     // std::cout << std::filesystem::current_path() << std::endl;
 
-    ShaderProgram mySP("../../shader/texture.vs", "../../shader/texture.fs", nullptr);
-	mySP.use();
-	mySP.setSampler("texture0", 0);
-	
-	float vert[] =
+	ShaderProgram basicSP("../../shader/mesh.vs", "../../shader/mesh.fs", nullptr);
+
+	Image::setFlipVerticallyOnLoad(true);
+	Image hifumi("../../resource/hifumi_10.jpg", GL_TEXTURE_2D);
+	Image mollu("../../resource/bruaka_64.png", GL_TEXTURE_2D);
+
+	float square[] =
 	{
-		  0.5, 0.5, 0.0,  1.0, 1.0,
-		 -0.5, 0.5, 0.0,  -1.0, 1.0,
-		-0.5, -0.5, 0.0,  -1.0, -1.0,
-		 0.5, -0.5, 0.0,  1.0, -1.0
+		0.5, 0.5, 0.0, 1.0, 1.0,
+		-0.5, 0.5, 0.0, 0.0, 1.0,
+		-0.5, -0.5, 0.0, 0.0, 0.0,
+		0.5, -0.5, 0.0, 1.0, 0.0
 	};
-	unsigned int idx[] =
+	unsigned int square_idx[] =
 	{
 		0, 1, 2,
 		0, 2, 3
 	};
+	std::vector<Vertex> vert(4);
+	std::vector<unsigned int> idx(6);
+	std::vector<Texture> tex(2);
 
-	GLuint VAO, VBO, EBO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+	// set vert
+	int stride = 5;
+	for(int i=0; i<vert.size(); i++)
+	{
+		vert[i].position = glm::vec3(square[stride*i], square[stride*i+1], square[stride*i+2]);
+		vert[i].texCoord = glm::vec2(square[stride*i+3], square[stride*i+4]);
+	}
 
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	// set idx
+	for(int i=0; i<idx.size(); i++) { idx[i] = square_idx[i]; }
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vert), vert, GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(idx), idx, GL_STATIC_DRAW);
+	// set tex
+	tex[0].textureID = hifumi.getImageID();
+	tex[0].type = Texture::TYPE::DIFFUSE;
+	tex[1].textureID = mollu.getImageID();
+	tex[1].type = Texture::TYPE::DIFFUSE;
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	Image::setFlipVerticallyOnLoad(true);
-	Image mollu("../../resource/bruaka_64.png", GL_TEXTURE_2D);
-	Image hifumi("../../resource/hifumi_10.jpg", GL_TEXTURE_2D);
+	Mesh myMesh(vert, idx, tex);
 
 	//render loop
 	while (!glfwWindowShouldClose(win))
@@ -79,14 +84,9 @@ int main()
 		glClearColor(0.25f, 0.25f, 0.25, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//texture
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, hifumi.getImageID());
-
-		//render object
-		mySP.use();
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		//render objects
+		basicSP.use();
+		myMesh.draw(basicSP);
 
 		//double buffering
 		glfwSwapBuffers(win);
@@ -101,3 +101,26 @@ void framebuffersize_callback(GLFWwindow* pWin, int w, int h)
 {
 	glViewport(0, 0, w, h);
 }
+
+/*
+GLuint VAO, VBO[2], EBO;
+
+glGenVertexArrays(1, &VAO);
+glGenBuffers(2, VBO);
+glGenBuffers(1, &EBO);
+
+glBindVertexArray(VAO);
+glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+glEnableVertexAttribArray(0);
+
+glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+glBufferData(GL_ARRAY_BUFFER, sizeof(square_color), square_color, GL_STATIC_DRAW);
+glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+glEnableVertexAttribArray(1);
+
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(square_idx), square_idx, GL_STATIC_DRAW);
+*/
