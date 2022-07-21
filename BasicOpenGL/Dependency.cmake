@@ -13,8 +13,7 @@ ExternalProject_Add(
     UPDATE_COMMAND ""
     PATCH_COMMAND ""
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
-    TEST_COMMAND ""
-    )
+    TEST_COMMAND "")
 set(DEP_LIST ${DEP_LIST} dep-spdlog)
 set(DEP_LIBS ${DEP_LIBS} spdlog$<$<CONFIG:Debug>:d>)
 
@@ -29,8 +28,7 @@ ExternalProject_Add(
         -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
         -DGLFW_BUILD_EXAMPLES=OFF
         -DGLFW_BUILD_TESTS=OFF
-        -DGLFW_BUILD_DOCS=OFF
-    )
+        -DGLFW_BUILD_DOCS=OFF)
 set(DEP_LIST ${DEP_LIST} dep_glfw)
 set(DEP_LIBS ${DEP_LIBS} glfw3)
 
@@ -45,8 +43,7 @@ ExternalProject_Add(
     CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
         -DGLAD_INSTALL=ON
-    TEST_COMMAND ""
-    )
+    TEST_COMMAND "")
 set(DEP_LIST ${DEP_LIST} dep_glad)
 set(DEP_LIBS ${DEP_LIBS} glad)
 
@@ -63,8 +60,7 @@ ExternalProject_Add(
     TEST_COMMAND ""
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${PROJECT_BINARY_DIR}/dep_glm-prefix/src/dep_glm/glm
-    ${DEP_INSTALL_DIR}/include/glm
-    )
+    ${DEP_INSTALL_DIR}/include/glm)
 set(DEP_LIST ${DEP_LIST} dep_glm)
 
 # stb
@@ -80,8 +76,7 @@ ExternalProject_Add(
     TEST_COMMAND ""
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy
         ${PROJECT_BINARY_DIR}/dep_stb-prefix/src/dep_stb/stb_image.h
-        ${DEP_INSTALL_DIR}/include/stb/stb_image.h
-    )
+        ${DEP_INSTALL_DIR}/include/stb/stb_image.h)
 set(DEP_LIST ${DEP_LIST} dep_stb)
 
 # assimp
@@ -99,11 +94,9 @@ ExternalProject_Add(
         -DASSIMP_BUILD_TESTS=OFF
         -DASSIMP_INJECT_DEBUG_POSTFIX=OFF
         -DASSIMP_BUILD_ZLIB=ON
-    TEST_COMMAND ""
-    )
+    TEST_COMMAND "")
 set(DEP_LIST ${DEP_LIST} dep_assimp)
 set(DEP_LIBS ${DEP_LIBS}
     assimp-vc142-mt$<$<CONFIG:Debug>:d>
     zlibstatic$<$<CONFIG:Debug>:d>
-    IrrXML$<$<CONFIG:Debug>:d>
-    )
+    IrrXML$<$<CONFIG:Debug>:d>)

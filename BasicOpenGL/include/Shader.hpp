@@ -71,6 +71,10 @@ void Shader::loadFromFile(const char* shaderPath, GLenum type)
     std::string shaderCode;
     const GLchar* pShaderCode = nullptr;
 
+    // check filepath
+    if(!shaderPath) { SPDLOG_ERROR("Shader::loadFromFile(nullptr, type={}): null filepath", type); return; }
+    SPDLOG_INFO("Shader::loadFromFile(\"{}\", type={})", shaderPath, type);
+
     // delete existing shader
     if(m_shaderID)
     {
@@ -78,10 +82,6 @@ void Shader::loadFromFile(const char* shaderPath, GLenum type)
         glDeleteShader(m_shaderID);
         nullify();
     }
-
-    // check filepath
-    if(!shaderPath) { SPDLOG_ERROR("Shader::loadFromFile(nullptr, type={}): null filepath", type); return; }
-    SPDLOG_INFO("Shader::loadFromFile(\"{}\", type={})", shaderPath, type);
 
     // open shader source file
     shaderFile.open(shaderPath);
@@ -117,7 +117,7 @@ void Shader::loadFromFile(const char* shaderPath, GLenum type)
         return;
     }
 
-    SPDLOG_INFO("ShaderID={}", m_shaderID);
+    SPDLOG_INFO("ShaderID = {}", m_shaderID);
 }
 
 // check error from glCompileShader()
@@ -149,6 +149,9 @@ class ShaderProgram
     ShaderProgram();
     ShaderProgram(const char*, const char*, const char*);
     ~ShaderProgram();
+
+    public:
+    GLuint getShaderProgramID() { return m_shaderProgramID; };
 
     void use();
 
@@ -258,7 +261,7 @@ void ShaderProgram::loadFromFile(const char* vertShaderPath, const char* fragSha
         return;
     }
     
-    SPDLOG_INFO("ShaderProgramID={}", m_shaderProgramID);
+    SPDLOG_INFO("ShaderProgramID = {}", m_shaderProgramID);
 }
 
 // check error from glLinkProgram()

@@ -11,8 +11,7 @@ add_executable(
     include/Shader.hpp
     include/Image.hpp
     include/Mesh.hpp
-    include/Model.hpp
-    )
+    include/Model.hpp)
 
 include(Dependency.cmake)
 

@@ -7,11 +7,6 @@
 // glm
 #include <glm/glm.hpp>
 
-// assimp
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 // opengl
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -36,10 +31,10 @@ struct Texture
     // texture type
     enum TYPE
     {
-        DIFFUSE = aiTextureType_DIFFUSE,
-        SPECULAR = aiTextureType_SPECULAR,
-        NORMAL = aiTextureType_NORMALS,
-        HEIGHT = aiTextureType_HEIGHT
+        DIFFUSE,
+        SPECULAR,
+        NORMAL,
+        HEIGHT
     };
 
     GLuint textureID; // Image.m_imageID
@@ -150,13 +145,17 @@ void Mesh::load(std::vector<Vertex>& vertices, std::vector<unsigned int>& indice
     // unbind VAO
     glBindVertexArray(0);
 
-    SPDLOG_INFO("Mesh.VAO={}", m_VAO);
+    SPDLOG_INFO("Mesh.VAO = {}", m_VAO);
 }
 
 // call this method after calling shaderProgram.use()
 //
 // uniform sampler2D in shaderProgram:
 // diffuseMap<n>, specularMap<n>, normalMap<n>, heightMap<n> (n = 0, 1, 2, ...)
+//
+// TODO: better solution?
+// uniform sampler2D diffuseMap[MAX_SIZE];
+// uniform numDiffuse;
 void Mesh::draw(ShaderProgram& shaderProgram)
 {
     // local vars
@@ -204,8 +203,12 @@ void Mesh::draw(ShaderProgram& shaderProgram)
     glDrawElements(GL_TRIANGLES, m_numIndices, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0); // unbind VAO
 
-    // set all texture units to defaults
-    for(int i = 0; i < numBoundedTexture; i++) { glActiveTexture(GL_TEXTURE0 + i); }
+    // unbind all textures
+    for(int i = 0; i < numBoundedTexture; i++)
+    {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 }
 
 #endif
